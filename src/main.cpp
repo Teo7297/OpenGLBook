@@ -61,8 +61,7 @@ int main()
 {
 	GL_INIT()
 
-	// glEnable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	///////////////////////////////////////////////////////////// SHADERS /////////////////////////////////////////////////////////////
 
 
@@ -99,13 +98,51 @@ int main()
 	///////////////////////////////////////////////////////////// RECTANGLE /////////////////////////////////////////////////////////////
 
 	// Vertices and indices for rectangle
-	float vertices_rect[] = {
-		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,		// top right
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,		// bottom right
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,		// bottom left
-		-0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f		// top left
-	};
+	//float vertices_rect[] = {
+	//	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,		// top right
+	//	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,		// bottom right
+	//	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,		// bottom left
+	//	-0.5f,  0.5f, 0.0f, 0.0f, 1.0f		// top left
+	//};
 
+	float vertices_rect[] = {
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f
+	};
 	unsigned int indices_rect[] = { // note that we start from 0!
 		0, 1, 3, // first triangle
 		1, 2, 3 // second triangle
@@ -121,12 +158,10 @@ int main()
 	unsigned int VAO_Simple_Rect;
 	glGenVertexArrays(1, &VAO_Simple_Rect);
 	glBindVertexArray(VAO_Simple_Rect);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * FLOAT_SIZE, nullptr);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * FLOAT_SIZE, reinterpret_cast<void*>(FLOAT_SIZE * 3));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * FLOAT_SIZE, reinterpret_cast<void*>(FLOAT_SIZE * 6));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * FLOAT_SIZE, nullptr);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * FLOAT_SIZE, reinterpret_cast<void*>(FLOAT_SIZE * 3));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
 
 	// Element buffer object (vertex index array)
 	unsigned int EBO;
@@ -146,23 +181,31 @@ int main()
 	const double targetFrameTime = 1.0 / 60.0;
 	double old = glfwGetTime();
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
+
 	while(!glfwWindowShouldClose(window))
 	{
-
-		//processInput(window);
 		inputProcessor.Process();
 
 		// Set Background
 		glClearColor(.2f, .3f, .3f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Time transform variable to see things moving easily
+		const float sinVal = sin(static_cast<float>(glfwGetTime())) + 1.f;
 
-		const glm::mat4 model =	glm::rotate(glm::identity<glm::mat4>(), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		///////// MVP Matrix for rectangle ////////////
+
+		const glm::mat4 model =
+			glm::rotate(glm::identity<glm::mat4>(), glm::radians(50.0f) * static_cast<float>(glfwGetTime() * 3), glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f)))
+			*
+			glm::scale(glm::identity<glm::mat4>(), glm::vec3(sinVal));
+		;
 		const glm::mat4 view = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.0f, 0.0f, -3.0f));
 		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
 		// note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-
-
 
 		//////////////// DRAW RECTANGLE //////////////////
 
@@ -185,7 +228,8 @@ int main()
 		glBindVertexArray(VAO_Simple_Rect);
 
 		// Draw call
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// Unbinding
 		Shader::Unbind();
