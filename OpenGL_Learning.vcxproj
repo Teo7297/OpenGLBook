@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\teoca\Desktop\OpenGL_Projects\OpenGLBook\include;C:\Users\teoca\Desktop\OpenGL_Projects\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\include;$(SolutionDir)\..\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\teoca\Desktop\OpenGL_Projects\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -142,12 +142,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\InputProcessor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="src\SimpleActionEvent.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Event.h" />
+    <ClInclude Include="include\InputProcessor.h" />
     <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\SimpleActionEvent.h" />
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>

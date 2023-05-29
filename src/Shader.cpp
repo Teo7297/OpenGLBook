@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
 	// 1. Get Shader code from file
@@ -101,6 +103,11 @@ void Shader::SetUniform(const std::string& name, float value) const
 void Shader::SetUniform(const std::string& name, float value1, float value2, float value3, float value4) const
 {
 	glUniform4f(glGetUniformLocation(ID, name.c_str()), value1, value2, value3, value4);
+}
+
+void Shader::SetUniform(const std::string& name, glm::mat4 matrix4x4) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, false, glm::value_ptr(matrix4x4));
 }
 // ################################# END PUBLIC #################################
 

@@ -1,0 +1,7 @@
+Transformations are Matrix * Vector operations.
+We can do multiple at once but REMEMBER:
+	- The order is reversed, right to left. The right most is the first getting multiplied by the vector.
+	- We shoud do different transformations in order:
+		1) Scale 		// identity matrix with values on the diagonal
+		2) Rotate		// giga matrix see book
+		3) Translate	// identity matrix with values on the last column

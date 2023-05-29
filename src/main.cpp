@@ -1,10 +1,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <thread>
 
 #include <Shader.h>
+#include <SimpleActionEvent.h>
+#include <InputProcessor.h>
 
 
 
@@ -48,50 +54,8 @@ void framebuffer_size_callback(GLFWwindow* window, const int width, const int he
 	glViewport(0, 0, width, height);
 }
 
-
 float mixFactor = 0.5f;
-bool up_released = true;
-bool up_pressed = true;
-bool down_released = true;
-bool down_pressed = true;
 
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if(glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_RELEASE)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	if (up_released && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		mixFactor = std::min(mixFactor + 0.1f, 1.0f);
-		up_released = false;
-		up_pressed = true;
-	}
-
-	if (down_released && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		mixFactor = std::max(mixFactor - 0.1f, 0.0f);
-		down_released = false;
-		down_pressed = true;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE)
-	{
-		up_pressed = false;
-		up_released = true;
-	}
-
-	if (down_pressed && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_RELEASE)
-	{
-		down_pressed = false;
-		down_released = true;
-	}
-}
 
 
 
@@ -99,9 +63,10 @@ int main()
 {
 	GL_INIT()
 
-	/*glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	///////////////////////////////////////////////////////////// SHADERS /////////////////////////////////////////////////////////////
+
 
 	const char* v1Path = "./shaders/VertexShader1.vert";
 	const char* v2Path = "./shaders/VertexShader2.vert";
@@ -183,7 +148,7 @@ int main()
 	if (data)
 	{
 		// Set texture data to Texture object
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -222,10 +187,10 @@ int main()
 
 	// Vertices and indices for rectangle
 	float vertices_rect[] = {
-		0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,		// top right
-		0.9f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,		// bottom right
-		0.4f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,		// bottom left
-		0.4f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f		// top left
+		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,		// top right
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,		// bottom right
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,		// bottom left
+		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f		// top left
 	};
 
 	unsigned int indices_rect[] = { // note that we start from 0!
@@ -263,10 +228,16 @@ int main()
 
 	///////////////////////////////////////////////////////////// END RECTANGLE /////////////////////////////////////////////////////////////
 
+	InputProcessor inputProcessor(window, mixFactor);
+
+	const double targetFrameTime = 1.0 / 60.0;
+	double old = glfwGetTime();
 
 	while(!glfwWindowShouldClose(window))
 	{
-		processInput(window);
+
+		//processInput(window);
+		inputProcessor.Process();
 
 		// Set Background
 		glClearColor(.2f, .3f, .3f, 1.f);
@@ -291,6 +262,18 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 
+
+		// Transformations for rect
+		glm::mat4 trans(1.0f);
+		trans = glm::translate(trans, glm::vec3(0.5f));
+		trans = glm::rotate(trans, glm::radians(90.f * timeValue), glm::vec3(0.f, 0.f, 1.f));
+		trans = glm::scale(trans, glm::vec3(0.5f));
+
+		glm::mat4 trans2(1.0f);
+		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 1.0f));
+		trans2 = glm::rotate(trans2, glm::radians(90.f * timeValue), glm::vec3(0.f, 0.f, 1.f));
+		trans2 = glm::scale(trans2, glm::vec3(0.5f) * greenValue);
+
 		// Draw rect
 		shader2.Bind();
 		shader2.SetUniform("uniformColor", 0.0f, greenValue, 0.0f, 1.0f);
@@ -300,8 +283,11 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		shader2.SetUniform("ourTexture2", 1);
-		shader2.SetUniform("mixFactor", mixFactor);
+		shader2.SetUniform("mixFactor", inputProcessor.m_mixFactor);
+		shader2.SetUniform("trans", trans);
 		glBindVertexArray(VAO_Simple_Rect);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		shader2.SetUniform("trans", trans2);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 		Shader::Unbind();
 		glBindVertexArray(0);
@@ -309,7 +295,34 @@ int main()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+
+		// Delay if the frame finished early
+		double frameTime = glfwGetTime() - old;
+		while (frameTime < targetFrameTime) {
+			frameTime = glfwGetTime() - old;
+		}
+		//std::cout << 1.0 / (glfwGetTime() - old) << std::endl;
+		old = glfwGetTime();
 	}
+
+
+	/// TESTING STUFF
+	// Create identity matrix
+	glm::mat4 trans(1.0f);
+	// Create translation vector
+	glm::vec3 translationVector(1.f, 1.f, 0.f);
+	// Create translation matrix
+	trans = glm::translate(trans, translationVector);
+
+	// Get our vector
+	glm::vec4 vec(1.f, 0.f, 0.f, 1.f);
+	// Translate it multiplying by the translation matrix
+	vec = trans * vec;
+	// Print resulting vector
+	std::cout << "( " << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << " )" << std::endl;
+	
+	/// END TESTING STUFF
 
 	glfwTerminate();
 	return 0;
