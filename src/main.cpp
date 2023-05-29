@@ -9,18 +9,19 @@
 #include <thread>
 
 #include <Shader.h>
-#include <SimpleActionEvent.h>
 #include <InputProcessor.h>
-
+#include <Texture.h>
 
 
 #define FLOAT_SIZE sizeof(GL_FLOAT)
+#define SCR_WIDTH 1600
+#define SCR_HEIGHT 1200
 
 #define GL_INIT() glfwInit(); \
 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);\
 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);\
 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);\
-GLFWwindow* window = glfwCreateWindow(1600, 1200, "LearnOpenGL", NULL, NULL);\
+GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);\
 if (window == nullptr)\
 {\
 	std::cout << "Failed to create GLFW window" << std::endl;\
@@ -33,7 +34,7 @@ if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))\
 	std::cout << "Failed to initialize GLAD" << std::endl;\
 	return -1;\
 }\
-glViewport(0, 0, 1600, 1200);\
+glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);\
 glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);\
 print_attributes_supported();
 
@@ -56,15 +57,12 @@ void framebuffer_size_callback(GLFWwindow* window, const int width, const int he
 
 float mixFactor = 0.5f;
 
-
-
-
 int main()
 {
 	GL_INIT()
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	///////////////////////////////////////////////////////////// SHADERS /////////////////////////////////////////////////////////////
 
 
@@ -79,118 +77,33 @@ int main()
 
 	///////////////////////////////////////////////////////////// END SHADERS /////////////////////////////////////////////////////////////
 
-	///////////////////////////////////////////////////////////// TRIANGLE /////////////////////////////////////////////////////////////
-
-	// Vertices for simple triangle
-	//float vertices[] = {
-	//	-0.7f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
-	//	-0.2f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
-	//	-0.45f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, // top
-	//};
-
-	float vertices[] = {
-		// 3 position        // 3 color        // 2 texcoords
-		-0.2f, -0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,			// left
-		 0.2f, -0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,			// right
-		 0.0f,  0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 1.0f			// top
-	};
-
-	float texCoords[] = {
-		0.0f, 0.0f, // lower-left corner
-		1.0f, 0.0f, // lower-right corner
-		0.5f, 1.0f // top-center corner
-	};
 
 	// Texture 1
 
-	// Create, bind and set Texture object
-	unsigned int texture1;
-	glGenTextures(1, &texture1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	Texture texture1("./textures/bricks.jpg", GL_TEXTURE_2D, GL_RGB, GL_RGB);
+	texture1.GL_TexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	texture1.GL_TexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	texture1.GL_TexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	texture1.GL_TexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	// Load texture jpg
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("./textures/bricks.jpg", &width, &height, &nrChannels, 0);
-	if(data)
-	{
-		// Set texture data to Texture object
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "FAILED::TEXTURE::LOADING" << std::endl;
-	}
-	// Free space
-	stbi_image_free(data);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Texture 2
-	unsigned int texture2;
-	glGenTextures(1, &texture2);
-	glActiveTexture(texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	Texture texture2("./textures/awesomeface.png", GL_TEXTURE_2D, GL_RGB, GL_RGBA, true);
+	texture2 .GL_TexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	texture2 .GL_TexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	texture2 .GL_TexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	texture2 .GL_TexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
-	// Load texture jpg
-	stbi_set_flip_vertically_on_load(true);
-	data = stbi_load("./textures/awesomeface.png", &width, &height, &nrChannels, 0);
-	
-	if (data)
-	{
-		// Set texture data to Texture object
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "FAILED::TEXTURE::LOADING" << std::endl;
-	}
-	// Free space
-	stbi_image_free(data);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Vertex buffer object
-	unsigned int VBO_Simple_Triangle;
-	glGenBuffers(1, &VBO_Simple_Triangle);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_Simple_Triangle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// Vertex array object (after binding will store vertex attrib calls)
-	unsigned int VAO_Simple_Triangle;
-	glGenVertexArrays(1, &VAO_Simple_Triangle);
-	glBindVertexArray(VAO_Simple_Triangle);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * FLOAT_SIZE, nullptr);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * FLOAT_SIZE, reinterpret_cast<void*>(3 * FLOAT_SIZE));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * FLOAT_SIZE, reinterpret_cast<void*>(6 * FLOAT_SIZE));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);								// Close VAO to save settings on it
-	glBindBuffer(GL_ARRAY_BUFFER, 0);			// Close other buffers to free resources
-
-
-	///////////////////////////////////////////////////////////// END TRIANGLE /////////////////////////////////////////////////////////////
 
 
 	///////////////////////////////////////////////////////////// RECTANGLE /////////////////////////////////////////////////////////////
 
 	// Vertices and indices for rectangle
 	float vertices_rect[] = {
-		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,		// top right
-		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,		// bottom right
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,		// top right
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,		// bottom right
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,		// bottom left
-		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f		// top left
+		-0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f		// top left
 	};
 
 	unsigned int indices_rect[] = { // note that we start from 0!
@@ -229,7 +142,7 @@ int main()
 	///////////////////////////////////////////////////////////// END RECTANGLE /////////////////////////////////////////////////////////////
 
 	InputProcessor inputProcessor(window, mixFactor);
-
+	 
 	const double targetFrameTime = 1.0 / 60.0;
 	double old = glfwGetTime();
 
@@ -243,56 +156,46 @@ int main()
 		glClearColor(.2f, .3f, .3f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		float timeValue = glfwGetTime();
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
-		// Draw triangle
-		shader1.Bind();													
-		shader1.SetUniform("positionOffset", 0.4f);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		shader1.SetUniform("ourTexture", 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		shader1.SetUniform("ourTexture2", 1);
-		glBindVertexArray(VAO_Simple_Triangle);											
-		glDrawArrays(GL_TRIANGLES, 0, 3);								
-		Shader::Unbind();
-		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		const glm::mat4 model =	glm::rotate(glm::identity<glm::mat4>(), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		const glm::mat4 view = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.0f, 0.0f, -3.0f));
+		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
+		// note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
 
 
 
-		// Transformations for rect
-		glm::mat4 trans(1.0f);
-		trans = glm::translate(trans, glm::vec3(0.5f));
-		trans = glm::rotate(trans, glm::radians(90.f * timeValue), glm::vec3(0.f, 0.f, 1.f));
-		trans = glm::scale(trans, glm::vec3(0.5f));
+		//////////////// DRAW RECTANGLE //////////////////
 
-		glm::mat4 trans2(1.0f);
-		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 1.0f));
-		trans2 = glm::rotate(trans2, glm::radians(90.f * timeValue), glm::vec3(0.f, 0.f, 1.f));
-		trans2 = glm::scale(trans2, glm::vec3(0.5f) * greenValue);
-
-		// Draw rect
+		// Shader
 		shader2.Bind();
-		shader2.SetUniform("uniformColor", 0.0f, greenValue, 0.0f, 1.0f);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		shader2.SetUniform("model", model);
+		shader2.SetUniform("view", view);
+		shader2.SetUniform("projection", projection);
 		shader2.SetUniform("ourTexture", 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
 		shader2.SetUniform("ourTexture2", 1);
 		shader2.SetUniform("mixFactor", inputProcessor.m_mixFactor);
-		shader2.SetUniform("trans", trans);
+
+		// Textures
+		texture1.Activate();
+		texture1.Bind();
+		texture2.Activate();
+		texture2.Bind();
+
+		// VAO
 		glBindVertexArray(VAO_Simple_Rect);
+
+		// Draw call
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-		shader2.SetUniform("trans", trans2);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		// Unbinding
 		Shader::Unbind();
 		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		texture2.Unbind();
 
+		//////////////// END RECTANGLE //////////////////
+
+
+		// Swap buffer and poll events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -305,24 +208,6 @@ int main()
 		//std::cout << 1.0 / (glfwGetTime() - old) << std::endl;
 		old = glfwGetTime();
 	}
-
-
-	/// TESTING STUFF
-	// Create identity matrix
-	glm::mat4 trans(1.0f);
-	// Create translation vector
-	glm::vec3 translationVector(1.f, 1.f, 0.f);
-	// Create translation matrix
-	trans = glm::translate(trans, translationVector);
-
-	// Get our vector
-	glm::vec4 vec(1.f, 0.f, 0.f, 1.f);
-	// Translate it multiplying by the translation matrix
-	vec = trans * vec;
-	// Print resulting vector
-	std::cout << "( " << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << " )" << std::endl;
-	
-	/// END TESTING STUFF
 
 	glfwTerminate();
 	return 0;
