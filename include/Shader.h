@@ -22,7 +22,7 @@ public:
 	Shader(const char* vertexPath, const char* fragmentPath);
 
 	// Binding
-	void Bind();
+	void Bind() const;
 	static void Unbind();
 
 	// Uniforms setting

@@ -75,7 +75,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
 // ################################# PUBLIC #################################
 
-void Shader::Bind()
+void Shader::Bind() const
 {
 	glUseProgram(ID);
 }
