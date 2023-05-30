@@ -1,15 +1,21 @@
 #include "InputProcessor.h"
+#include <glm/glm.hpp>
 
 InputProcessor::InputProcessor(GLFWwindow* window, float mixFactor)
-	: m_window(window), m_mixFactor(mixFactor)
+	: m_window(window), m_mixFactor(mixFactor), cameraRef(Camera::GetInstance())
 {
 }
+
+extern float* DELTA_TIME;
 
 void InputProcessor::Process()
 {
 	if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		//EventManager::Get()->dispatchEvent(&onESCAPEPressed);
 		glfwSetWindowShouldClose(m_window, true);
+
+	if (glfwGetKey(m_window, GLFW_KEY_F1) == GLFW_PRESS)
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	if (glfwGetKey(m_window, GLFW_KEY_F3) == GLFW_PRESS)
 		//EventManager::Get()->dispatchEvent(&onF3Pressed);
@@ -48,5 +54,15 @@ void InputProcessor::Process()
 		down_pressed = false;
 		down_released = true;
 	}
+
+	///////////////// CAMERA //////////////////////////
+	if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraRef.m_Pos += *DELTA_TIME * cameraRef.m_Speed * cameraRef.m_Front;
+	if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraRef.m_Pos -= *DELTA_TIME * cameraRef.m_Speed * cameraRef.m_Front;
+	if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraRef.m_Pos -= glm::normalize(glm::cross(cameraRef.m_Front, cameraRef.m_Up)) * cameraRef.m_Speed * *DELTA_TIME;
+	if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraRef.m_Pos += glm::normalize(glm::cross(cameraRef.m_Front, cameraRef.m_Up)) * cameraRef.m_Speed * *DELTA_TIME;
 }
 

@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include "SimpleActionEvent.h"
+#include <Camera.h>
 
 
 class InputProcessor
@@ -18,6 +19,8 @@ private:
 	bool up_released = true;
 	bool down_pressed = false;
 	bool down_released = true;
+
+	Camera& cameraRef;
 
 	SimpleActionEvent onUPPressed;
 	SimpleActionEvent onUPReleased;

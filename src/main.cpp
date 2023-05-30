@@ -1,9 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/random.hpp>
 
 #include <iostream>
 #include <thread>
@@ -11,17 +11,25 @@
 #include <Shader.h>
 #include <InputProcessor.h>
 #include <Texture.h>
+#include <Camera.h>
 
 
 #define FLOAT_SIZE sizeof(GL_FLOAT)
 #define SCR_WIDTH 1600
 #define SCR_HEIGHT 1200
 
+extern int SCREEN_WIDTH = SCR_WIDTH;
+extern int SCREEN_HEIGHT = SCR_HEIGHT;
+GLFWwindow* window;
+extern GLFWwindow* WINDOW = window;
+float deltaTime;
+extern float* DELTA_TIME = &deltaTime;
+
 #define GL_INIT() glfwInit(); \
 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);\
 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);\
 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);\
-GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);\
+window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);\
 if (window == nullptr)\
 {\
 	std::cout << "Failed to create GLFW window" << std::endl;\
@@ -55,12 +63,14 @@ void framebuffer_size_callback(GLFWwindow* window, const int width, const int he
 	glViewport(0, 0, width, height);
 }
 
+
+
 float mixFactor = 0.5f;
 
 int main()
 {
 	GL_INIT()
-
+	
 	
 	///////////////////////////////////////////////////////////// SHADERS /////////////////////////////////////////////////////////////
 
@@ -176,10 +186,19 @@ int main()
 
 	///////////////////////////////////////////////////////////// END RECTANGLE /////////////////////////////////////////////////////////////
 
+	/////////////
+	///
+	Camera& camera = Camera::GetInstance();
+	////////////
+
+
+
 	InputProcessor inputProcessor(window, mixFactor);
-	 
-	const double targetFrameTime = 1.0 / 60.0;
-	double old = glfwGetTime();
+
+	deltaTime = 0.0f; // Time between current frame and last frame
+	float lastFrame = 0.0f; // Time of last frame
+
+
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -189,6 +208,7 @@ int main()
 	{
 		inputProcessor.Process();
 
+
 		// Set Background
 		glClearColor(.2f, .3f, .3f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -197,22 +217,17 @@ int main()
 		const float sinVal = sin(static_cast<float>(glfwGetTime())) + 1.f;
 
 		///////// MVP Matrix for rectangle ////////////
+		const glm::mat4 projection = glm::perspective(glm::radians(camera.m_POV), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
 
-		const glm::mat4 model =
-			glm::rotate(glm::identity<glm::mat4>(), glm::radians(50.0f) * static_cast<float>(glfwGetTime() * 3), glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f)))
-			*
-			glm::scale(glm::identity<glm::mat4>(), glm::vec3(sinVal));
-		;
-		const glm::mat4 view = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.0f, 0.0f, -3.0f));
-		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
-		// note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+		
+
 
 		//////////////// DRAW RECTANGLE //////////////////
 
 		// Shader
 		shader2.Bind();
-		shader2.SetUniform("model", model);
-		shader2.SetUniform("view", view);
+		//shader2.SetUniform("model", model);
+		shader2.SetUniform("view", camera.GetView());
 		shader2.SetUniform("projection", projection);
 		shader2.SetUniform("ourTexture", 0);
 		shader2.SetUniform("ourTexture2", 1);
@@ -229,7 +244,21 @@ int main()
 
 		// Draw call
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		for (int i = 0; i < 10; ++i)
+		{
+			
+			const glm::mat4 model =
+				glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.25f * i - 1.f, 0.1f * i, 0.2f * i))
+				*
+				glm::rotate(glm::identity<glm::mat4>(), glm::radians(50.0f) * static_cast<float>(glfwGetTime() * 3), glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f)))
+				*
+				glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.25))
+				;
+			shader2.SetUniform("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		}
 
 		// Unbinding
 		Shader::Unbind();
@@ -244,13 +273,15 @@ int main()
 		glfwPollEvents();
 
 
-		// Delay if the frame finished early
-		double frameTime = glfwGetTime() - old;
-		while (frameTime < targetFrameTime) {
-			frameTime = glfwGetTime() - old;
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		while(deltaTime < 1.f/60.f)
+		{
+			deltaTime += glfwGetTime() - currentFrame;
+			currentFrame = glfwGetTime();
 		}
-		//std::cout << 1.0 / (glfwGetTime() - old) << std::endl;
-		old = glfwGetTime();
+		lastFrame = currentFrame;
+
 	}
 
 	glfwTerminate();
