@@ -1,10 +1,12 @@
 #include <Renderer.h>
 #include <iostream>
+#include <glad/glad.h>
 
 void GLClearError()
 {
     while (glGetError() != GL_NO_ERROR)
-        ;
+    {
+    }
 }
 
 bool GLLogCall(const char* function, const char* file, int line)
@@ -28,7 +30,7 @@ bool GLLogCall(const char* function, const char* file, int line)
 
 void Renderer::Clear() const
 {
-    GLCall(glClear(GL_COLOR_BUFFER_BIT));
+    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void Renderer::Draw(const VertexArray& va, const ElementBuffer& ib, const Shader& shader) const
@@ -37,6 +39,11 @@ void Renderer::Draw(const VertexArray& va, const ElementBuffer& ib, const Shader
     va.Bind();
     ib.Bind();
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
-
+    //GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
     //! Unbinding is just a waste of resources !
+}
+
+void Renderer::SetBackgroundColor(const float r, const float g, const float b, const float alpha)
+{
+    glClearColor(r, g, b, alpha);
 }

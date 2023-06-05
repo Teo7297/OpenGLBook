@@ -6,14 +6,14 @@
 #include <Shader.h>
 
 
-#define ASSERT(x) \
+#define ASSERT(x); \
     if (!(x))     \
         __debugbreak(); // __ is for the compiler, this only works for msvc
 
-#define GLCall(x)   \
+#define GLCall(x);   \
     GLClearError(); \
     x;              \
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+    ASSERT(GLLogCall(#x, __FILE__, __LINE__));
 
 // Clear all the error flags from openGL
 void GLClearError();
@@ -29,4 +29,5 @@ public:
     // ~Renderer();
     void Clear() const;
     void Draw(const VertexArray& va, const ElementBuffer& ib, const Shader& shader) const;
+    void SetBackgroundColor(float r, float g, float b, float alpha);
 };
