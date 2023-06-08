@@ -3,6 +3,7 @@
 #include <Renderer.h>
 
 VertexArray::VertexArray()
+	: m_VerticesNumber(0)
 {
     GLCall(glGenVertexArrays(1, &m_RendererID));
 }
@@ -28,6 +29,8 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
         GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), reinterpret_cast<const void*>(offset)));
         offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
     }
+
+    m_VerticesNumber = vb.GetBufferSize() / layout.GetElements().size();
 }
 
 void VertexArray::Bind() const
@@ -38,4 +41,9 @@ void VertexArray::Bind() const
 void VertexArray::Unbind() const
 {
     GLCall(glBindVertexArray(0));
+}
+
+unsigned int VertexArray::GetVerticesNumber() const
+{
+    return m_VerticesNumber;
 }

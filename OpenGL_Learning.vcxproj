@@ -162,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\Colors.h" />
     <ClInclude Include="include\ElementBuffer.h" />
     <ClInclude Include="include\Event.h" />
     <ClInclude Include="include\InputProcessor.h" />
@@ -177,6 +178,10 @@
   <ItemGroup>
     <None Include="shaders\FragmentShader1.frag" />
     <None Include="shaders\FragmentShader2.frag" />
+    <None Include="shaders\LightEmitter.frag" />
+    <None Include="shaders\LightEmitter.vert" />
+    <None Include="shaders\LightReceiver.frag" />
+    <None Include="shaders\LightReceiver.vert" />
     <None Include="shaders\VertexShader1.vert" />
     <None Include="shaders\VertexShader2.vert" />
   </ItemGroup>

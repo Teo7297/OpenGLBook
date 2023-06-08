@@ -8,11 +8,12 @@
 #include <iostream>
 #include <thread>
 
+#include <Colors.h>
+
 #include <Shader.h>
 #include <InputProcessor.h>
 #include <Texture.h>
 #include <Camera.h>
-
 #include <Renderer.h>
 #include <VertexBufferLayout.h>
 
@@ -67,6 +68,12 @@ void framebuffer_size_callback(GLFWwindow* window, const int width, const int he
 	glViewport(0, 0, width, height);
 }
 
+glm::vec3 getModelToWorldCoordinates(const glm::mat4& modelMatrix, const glm::vec3& modelCoordinates)
+{
+	glm::mat4 inverseModelMatrix = glm::inverse(modelMatrix);
+	glm::vec4 worldCoordinates = inverseModelMatrix * glm::vec4(modelCoordinates, 1.0f);
+	return glm::vec3(worldCoordinates);
+}
 
 
 float mixFactor = 0.5f;
@@ -90,6 +97,13 @@ int main()
 	Shader shader1 = Shader(v1Path, f1Path);
 	Shader shader2 = Shader(v2Path, f2Path);
 
+	const char* lightVPath = "./shaders/LightReceiver.vert";
+	const char* lightFPath = "./shaders/LightReceiver.frag";
+	Shader lightReceiverShader = Shader(lightVPath, lightFPath);
+
+	const char* lightEmitterVPath = "./shaders/LightEmitter.vert";
+	const char* lightEmitterFPath = "./shaders/LightEmitter.frag";
+	Shader lightEmitterShader = Shader(lightEmitterVPath, lightEmitterFPath);
 
 	///////////////////////////////////////////////////////////// END SHADERS /////////////////////////////////////////////////////////////
 
@@ -114,64 +128,45 @@ int main()
 
 	///////////////////////////////////////////////////////////// RECTANGLE /////////////////////////////////////////////////////////////
 
-	float vertices_rect[] = {
-		// Front face
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // Bottom left
-		 0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  // Bottom right
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,  // Top right
-		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,  // Top left
-
-		// Back face
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // Bottom left
-		 0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // Bottom right
-		 0.5f,  0.5f, 0.5f, 1.0f, 1.0f,   // Top right
-		-0.5f,  0.5f, 0.5f, 0.0f, 1.0f,   // Top left
-
-		// Left face
-		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,  // Bottom left
-		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  // Bottom right
-		-0.5f,  0.5f, -0.5f, 1.0f, 1.0f,  // Top right
-		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,  // Top left
-
-		// Right face
-		 0.5f, -0.5f,  0.5f, 0.0f, 0.0f,  // Bottom left
-		 0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  // Bottom right
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,  // Top right
-		 0.5f,  0.5f,  0.5f, 0.0f, 1.0f,  // Top left
-
-		 // Top face
-		-0.5f,  0.5f, -0.5f, 0.0f, 0.0f,  // Bottom left
-		 0.5f,  0.5f, -0.5f, 1.0f, 0.0f,  // Bottom right
-		 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,  // Top right
-		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,  // Top left
-
-		// Bottom face
-	   -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // Bottom left
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  // Bottom right
-		0.5f, -0.5f,  0.5f, 1.0f, 1.0f,  // Top right
-	   -0.5f, -0.5f,  0.5f, 0.0f, 1.0f   // Top left
+	float vertices[] = {
+		// positions		| normals		     | texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f
 	};
-
-	unsigned int indices_rect[] = {
-		0, 1, 2,
-		2, 3, 0,  // Front face
-
-		4, 5, 6,
-		6, 7, 4,  // Back face
-
-		8, 9, 10,
-		10, 11, 8,  // Left face
-
-		12, 13, 14,
-		14, 15, 12,  // Right face
-
-		16, 17, 18,
-		18, 19, 16,  // Top face
-
-		20, 21, 22,
-		22, 23, 20  // Bottom face
-	};
-
 
 
 	///////////////////////////////////////////////////////////// END RECTANGLE /////////////////////////////////////////////////////////////
@@ -181,16 +176,17 @@ int main()
 		Renderer renderer = Renderer();
 		Camera& camera = Camera::GetInstance();
 
-		VertexBuffer VBO_Rect = VertexBuffer(vertices_rect, sizeof(vertices_rect));
+		VertexBuffer VBO_Rect = VertexBuffer(vertices, sizeof(vertices));
 
 		VertexBufferLayout VBO_Rect_Layout = VertexBufferLayout();
+		VBO_Rect_Layout.Push<float>(3);
 		VBO_Rect_Layout.Push<float>(3);
 		VBO_Rect_Layout.Push<float>(2);
 
 		VertexArray VAO_Rect = VertexArray();
 		VAO_Rect.AddBuffer(VBO_Rect, VBO_Rect_Layout);
 
-		ElementBuffer EBO_Rect = ElementBuffer(indices_rect, sizeof(indices_rect));
+		ElementBuffer EBO_Rect = ElementBuffer({}, 0);
 		
 
 
@@ -205,8 +201,7 @@ int main()
 		{
 			inputProcessor.Process();
 
-
-			renderer.SetBackgroundColor(.2f, .3f, .3f, 1.f);
+			renderer.SetBackgroundColor(BLACK);
 			renderer.Clear();
 
 			// Time transform variable to see things moving easily
@@ -215,17 +210,39 @@ int main()
 			const glm::mat4 projection = glm::perspective(glm::radians(camera.m_POV), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
 
 
+			glm::vec3 cubePosition = glm::vec3(0.f);
+			const glm::mat4 model1 =
+				glm::translate(glm::identity<glm::mat4>(), cubePosition)
+				*
+				glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f));
 
 
-			//////////////// DRAW RECTANGLE //////////////////
+			glm::vec3 lightPosition = glm::vec3(2.0f, .5f, 1.0f);
+			const glm::mat4 model2 =
+				glm::translate(glm::identity<glm::mat4>(), lightPosition)
+				*
+				glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.3f));
+
+
+
+			//////////////// DRAW CUBE //////////////////
 
 			// Shader
-			shader2.Bind();
-			shader2.SetUniform("view", camera.GetView());
-			shader2.SetUniform("projection", projection);
-			shader2.SetUniform("ourTexture", 0);
-			shader2.SetUniform("ourTexture2", 1);
-			shader2.SetUniform("mixFactor", inputProcessor.m_mixFactor);
+			lightReceiverShader.Bind();
+			lightReceiverShader.SetUniform("model", model1);
+			lightReceiverShader.SetUniform("view", camera.GetView());
+			lightReceiverShader.SetUniform("projection", projection);
+			lightReceiverShader.SetUniform("ambientLightColor", glm::vec3(1.0f, .3f, 0.f));
+			lightReceiverShader.SetUniform("ambientLightIntensity", inputProcessor.m_mixFactor);
+			lightReceiverShader.SetUniform("lightDirection", lightPosition - cubePosition);
+			lightReceiverShader.SetUniform("objectColor", glm::vec3(0.5f, 0.3f, 0.1f));
+
+			lightEmitterShader.Bind();
+			lightEmitterShader.SetUniform("model", model2);
+			lightEmitterShader.SetUniform("view", camera.GetView());
+			lightEmitterShader.SetUniform("projection", projection);
+			lightEmitterShader.SetUniform("u_color", glm::vec3(1.f));
+			
 
 			// Textures
 			texture1.Activate();
@@ -236,19 +253,9 @@ int main()
 			// VAO
 			VAO_Rect.Bind();
 
-			for (int i = 0; i < 10; i++)
-			{
+			renderer.Draw(VAO_Rect, EBO_Rect, lightReceiverShader);
+			renderer.Draw(VAO_Rect, EBO_Rect, lightEmitterShader);
 
-				const glm::mat4 model =
-					glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.25f * i - 1.f, 0.1f * i, 0.2f * i))
-					*
-					glm::rotate(glm::identity<glm::mat4>(), glm::radians(50.0f) * static_cast<float>(glfwGetTime() * 3), glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f)))
-					*
-					glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.2f))
-					;
-				shader2.SetUniform("model", model);
-				renderer.Draw(VAO_Rect, EBO_Rect, shader2);
-			}
 
 			// Unbinding
 			Shader::Unbind();
@@ -258,7 +265,6 @@ int main()
 			//////////////// END RECTANGLE //////////////////
 
 
-			// Swap buffer and poll events
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
