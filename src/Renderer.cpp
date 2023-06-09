@@ -52,6 +52,6 @@ void Renderer::Draw(const VertexArray& va, const ElementBuffer& ib, const Shader
 
 void Renderer::SetBackgroundColor(const Color& color)
 {
-    auto [r, g, b, a] = color;
-    glClearColor(r, g, b, a);
+    auto [r, g, b] = color;
+    glClearColor(r, g, b, 1.0f);
 }

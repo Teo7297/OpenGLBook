@@ -201,7 +201,7 @@ int main()
 		{
 			inputProcessor.Process();
 
-			renderer.SetBackgroundColor(Colors::A_DARK_GRAY);
+			renderer.SetBackgroundColor(Colors::DARK_GRAY);
 			renderer.Clear();
 			// Time transform variable to see things moving easily
 			const float sinVal = sin(static_cast<float>(lastFrame));
@@ -220,10 +220,10 @@ int main()
 
 			glm::vec3 lightPosition = glm::vec3(2.0f, .5f, 1.0f);
 			const glm::mat4 model2 =
-				glm::translate(glm::identity<glm::mat4>(), glm::vec3(1.f))
-				//glm::translate(glm::identity<glm::mat4>(), glm::vec3(sinVal, fastSinVal, cosVal))
+				//glm::translate(glm::identity<glm::mat4>(), glm::vec3(1.f))
+				glm::translate(glm::identity<glm::mat4>(), glm::vec3(sinVal, fastSinVal, cosVal))
 				*
-				glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.3f));
+				glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.12f));
 
 			const glm::vec3 lightWorldPosition = glm::vec3(model2 * glm::vec4(0.f, 0.f, 0.f, 1.f));
 
@@ -237,17 +237,19 @@ int main()
 			lightReceiverShader.SetUniform("model", model1);
 			lightReceiverShader.SetUniform("view", camera.GetView());
 			lightReceiverShader.SetUniform("projection", projection);
-			lightReceiverShader.SetUniform("ambientLightColor", Colors::A_WHITE);
+			lightReceiverShader.SetUniform("ambientLightColor", Colors::WHITE);
 			lightReceiverShader.SetUniform("ambientLightIntensity", inputProcessor.m_mixFactor);
-			lightReceiverShader.SetUniform("lightDirection", glm::normalize(lightWorldPosition - cubePosition));
-			lightReceiverShader.SetUniform("lightColor", Colors::A_WHITE);
-			lightReceiverShader.SetUniform("objectColor", Colors::A_ORANGE);
+			lightReceiverShader.SetUniform("lightPos", lightWorldPosition);
+			lightReceiverShader.SetUniform("lightColor", Colors::WHITE);
+			lightReceiverShader.SetUniform("objectColor", Colors::ORANGE);
+			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
+
 
 			lightEmitterShader.Bind();
 			lightEmitterShader.SetUniform("model", model2);
 			lightEmitterShader.SetUniform("view", camera.GetView());
 			lightEmitterShader.SetUniform("projection", projection);
-			lightEmitterShader.SetUniform("u_color", Colors::A_WHITE);
+			lightEmitterShader.SetUniform("u_color", Colors::WHITE);
 			
 
 			// Textures
