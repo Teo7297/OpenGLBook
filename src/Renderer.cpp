@@ -50,7 +50,8 @@ void Renderer::Draw(const VertexArray& va, const ElementBuffer& ib, const Shader
     //! Unbinding is just a waste of resources !
 }
 
-void Renderer::SetBackgroundColor(const float r, const float g, const float b, const float alpha)
+void Renderer::SetBackgroundColor(const Color& color)
 {
-    glClearColor(r, g, b, alpha);
+    auto [r, g, b, a] = color;
+    glClearColor(r, g, b, a);
 }

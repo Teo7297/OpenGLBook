@@ -4,6 +4,7 @@
 #include <VertexArray.h>
 #include <ElementBuffer.h>
 #include <Shader.h>
+#include <Colors.h>
 
 
 #define ASSERT(x); \
@@ -29,5 +30,5 @@ public:
     // ~Renderer();
     void Clear() const;
     void Draw(const VertexArray& va, const ElementBuffer& ib, const Shader& shader) const;
-    void SetBackgroundColor(float r, float g, float b, float alpha);
+    void SetBackgroundColor(const Color& color);
 };

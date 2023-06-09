@@ -10,6 +10,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include <Colors.h>
 
 class Shader
 {
@@ -32,6 +33,8 @@ public:
 	void SetUniform(const std::string& name, float value1,float value2,float value3,float value4) const;
 	void SetUniform(const std::string& name, glm::mat4 matrix4x4) const;
 	void SetUniform(const std::string& name, glm::vec3 vec3) const;
+	void SetUniform(const std::string& name, glm::vec4 vec4) const;
+	void SetUniform(const std::string& name, const Color& color) const;
 
 
 private:
