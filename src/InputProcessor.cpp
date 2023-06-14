@@ -28,7 +28,8 @@ void InputProcessor::Process()
 	if (up_released && glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
 		//EventManager::Get()->dispatchEvent(&onUPPressed);
-		m_mixFactor = std::min(m_mixFactor + 0.1f, 1.0f);
+		//m_mixFactor = std::min(m_mixFactor + 0.1f, 1.0f);
+		m_mixFactor += 1;
 		up_released = false;
 		up_pressed = true;
 	}
@@ -36,7 +37,8 @@ void InputProcessor::Process()
 	if (down_released && glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
 		//EventManager::Get()->dispatchEvent(&onDOWNPressed);
-		m_mixFactor = std::max(m_mixFactor - 0.1f, 0.0f);
+		//m_mixFactor = std::max(m_mixFactor - 0.1f, 0.0f);
+		m_mixFactor -= 1;
 		down_released = false;
 		down_pressed = true;
 	}

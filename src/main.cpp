@@ -185,6 +185,20 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f
 	};
 
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(2.0f, 5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f, 3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f, 2.0f, -2.5f),
+		glm::vec3(1.5f, 0.2f, -1.5f),
+		glm::vec3(-1.3f, 1.0f, -1.5f)
+	};
+
+
 
 	///////////////////////////////////////////////////////////// END RECTANGLE /////////////////////////////////////////////////////////////
 	
@@ -229,16 +243,16 @@ int main()
 
 
 			auto cubePosition = glm::vec3(0.f);
-			const glm::mat4 model1 =
+			/*const glm::mat4 model1 =
 				glm::translate(glm::identity<glm::mat4>(), cubePosition)
 				*
-				glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f));
+				glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f));*/
 
 
 			glm::vec3 lightPosition = glm::vec3(2.0f, .5f, 1.0f);
 			const glm::mat4 model2 =
-				glm::translate(glm::identity<glm::mat4>(), glm::vec3(1.f, 0.f, 0.5f))
-				//glm::translate(glm::identity<glm::mat4>(), glm::vec3(glm::abs(sinVal), fastSinVal + .3f, cosVal))
+				//glm::translate(glm::identity<glm::mat4>(), glm::vec3(1.f, 0.f, 0.5f))
+				glm::translate(glm::identity<glm::mat4>(), glm::vec3(sinVal, cosVal, 1.f))
 				*
 				glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.12f));
 
@@ -251,29 +265,22 @@ int main()
 
 			// Shader
 			lightReceiverShader.Bind();
-			lightReceiverShader.SetUniform("model", model1);
+			//lightReceiverShader.SetUniform("model", model1);
 			lightReceiverShader.SetUniform("view", camera.GetView());
 			lightReceiverShader.SetUniform("projection", projection);
 
-			//lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.0215f,	0.1745f,	0.0215f));
-			//lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.07568f,0.61424f,0.07568f));
-			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.633f,	0.727811f,	0.633f));
-			//lightReceiverShader.SetUniform("material.shininess", 0.6f * 128);
 
 			lightReceiverShader.SetUniform("material.diffuse", 2);
 			lightReceiverShader.SetUniform("material.specular", 3);
 			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.5f));
 			lightReceiverShader.SetUniform("material.shininess", 32.f);
 
-			/*lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.5f,	0.5f,	0.0f));
-			lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.5f,0.5f,0.4f));
-			lightReceiverShader.SetUniform("material.specular", glm::vec3(0.7f,	0.7f,	0.04f));
-			lightReceiverShader.SetUniform("material.shininess", .078125f * 128);*/
 
 			lightReceiverShader.SetUniform("light.position", lightWorldPosition);
-			lightReceiverShader.SetUniform("light.ambient", glm::vec3(.2f));
-			lightReceiverShader.SetUniform("light.diffuse", glm::vec3(.5f));
-			lightReceiverShader.SetUniform("light.specular", glm::vec3(1.f));
+			lightReceiverShader.SetUniform("light.direction", -0.2f, -1.0f, -0.3f);
+			lightReceiverShader.SetUniform("light.ambient", .2f, .2f, .2f);
+			lightReceiverShader.SetUniform("light.diffuse", .5f, .5f, .5f);
+			lightReceiverShader.SetUniform("light.specular", 1.f, 1.f, 1.f);
 			lightReceiverShader.SetUniform("objectColor", Colors::WHITE);
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
 
@@ -298,7 +305,17 @@ int main()
 			// VAO
 			VAO_Rect.Bind();
 
-			renderer.Draw(VAO_Rect, EBO_Rect, lightReceiverShader);
+			for (int i = 0; i < (int)inputProcessor.m_mixFactor; i++)
+			{
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, cubePositions[i]);
+				float angle = 20.0f * i;
+				model = glm::rotate(model, glm::radians(angle * sinVal), glm::vec3(1.0f, 0.3f, 0.5f));
+				lightReceiverShader.SetUniform("model", model);
+
+				renderer.Draw(VAO_Rect, EBO_Rect, lightReceiverShader);
+			}
+
 			renderer.Draw(VAO_Rect, EBO_Rect, lightEmitterShader);
 
 
