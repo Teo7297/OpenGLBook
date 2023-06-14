@@ -125,6 +125,23 @@ int main()
 	texture2.GL_TexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
+	// Texture 3 Container wood diffuse map
+	Texture texture3("./textures/container2.png", GL_TEXTURE_2D, GL_RGB, GL_RGBA, true);
+	texture3.GL_TexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	texture3.GL_TexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	texture3.GL_TexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	texture3.GL_TexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Texture 4 Container wood specular map
+	Texture texture4("./textures/container2_specular.png", GL_TEXTURE_2D, GL_RGB, GL_RGBA, true);
+	texture4.GL_TexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	texture4.GL_TexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	texture4.GL_TexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	texture4.GL_TexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+
+
 
 	///////////////////////////////////////////////////////////// RECTANGLE /////////////////////////////////////////////////////////////
 
@@ -238,21 +255,26 @@ int main()
 			lightReceiverShader.SetUniform("view", camera.GetView());
 			lightReceiverShader.SetUniform("projection", projection);
 
-			/*lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.0215f,	0.1745f,	0.0215f));
-			lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.07568f,0.61424f,0.07568f));
-			lightReceiverShader.SetUniform("material.specular", glm::vec3(0.633f,	0.727811f,	0.633f));
-			lightReceiverShader.SetUniform("material.shininess", 0.6f * 128);*/
+			//lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.0215f,	0.1745f,	0.0215f));
+			//lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.07568f,0.61424f,0.07568f));
+			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.633f,	0.727811f,	0.633f));
+			//lightReceiverShader.SetUniform("material.shininess", 0.6f * 128);
 
-			lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.5f,	0.5f,	0.0f));
+			lightReceiverShader.SetUniform("material.diffuse", 2);
+			lightReceiverShader.SetUniform("material.specular", 3);
+			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.5f));
+			lightReceiverShader.SetUniform("material.shininess", 32.f);
+
+			/*lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.5f,	0.5f,	0.0f));
 			lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.5f,0.5f,0.4f));
 			lightReceiverShader.SetUniform("material.specular", glm::vec3(0.7f,	0.7f,	0.04f));
-			lightReceiverShader.SetUniform("material.shininess", .078125f * 128);
+			lightReceiverShader.SetUniform("material.shininess", .078125f * 128);*/
 
 			lightReceiverShader.SetUniform("light.position", lightWorldPosition);
 			lightReceiverShader.SetUniform("light.ambient", glm::vec3(.2f));
 			lightReceiverShader.SetUniform("light.diffuse", glm::vec3(.5f));
 			lightReceiverShader.SetUniform("light.specular", glm::vec3(1.f));
-			lightReceiverShader.SetUniform("objectColor", Colors::YELLOW);
+			lightReceiverShader.SetUniform("objectColor", Colors::WHITE);
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
 
 
@@ -268,6 +290,10 @@ int main()
 			texture1.Bind();
 			texture2.Activate();
 			texture2.Bind();
+			texture3.Activate();
+			texture3.Bind();
+			texture4.Activate();
+			texture4.Bind();
 
 			// VAO
 			VAO_Rect.Bind();
