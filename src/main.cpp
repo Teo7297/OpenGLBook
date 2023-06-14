@@ -220,8 +220,8 @@ int main()
 
 			glm::vec3 lightPosition = glm::vec3(2.0f, .5f, 1.0f);
 			const glm::mat4 model2 =
-				//glm::translate(glm::identity<glm::mat4>(), glm::vec3(1.f))
-				glm::translate(glm::identity<glm::mat4>(), glm::vec3(sinVal, fastSinVal, cosVal))
+				glm::translate(glm::identity<glm::mat4>(), glm::vec3(1.f, 0.f, 0.5f))
+				//glm::translate(glm::identity<glm::mat4>(), glm::vec3(glm::abs(sinVal), fastSinVal + .3f, cosVal))
 				*
 				glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.12f));
 
@@ -237,11 +237,22 @@ int main()
 			lightReceiverShader.SetUniform("model", model1);
 			lightReceiverShader.SetUniform("view", camera.GetView());
 			lightReceiverShader.SetUniform("projection", projection);
-			lightReceiverShader.SetUniform("ambientLightColor", Colors::WHITE);
-			lightReceiverShader.SetUniform("ambientLightIntensity", inputProcessor.m_mixFactor);
-			lightReceiverShader.SetUniform("lightPos", lightWorldPosition);
-			lightReceiverShader.SetUniform("lightColor", Colors::WHITE);
-			lightReceiverShader.SetUniform("objectColor", Colors::ORANGE);
+
+			/*lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.0215f,	0.1745f,	0.0215f));
+			lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.07568f,0.61424f,0.07568f));
+			lightReceiverShader.SetUniform("material.specular", glm::vec3(0.633f,	0.727811f,	0.633f));
+			lightReceiverShader.SetUniform("material.shininess", 0.6f * 128);*/
+
+			lightReceiverShader.SetUniform("material.ambient", glm::vec3(0.5f,	0.5f,	0.0f));
+			lightReceiverShader.SetUniform("material.diffuse", glm::vec3(0.5f,0.5f,0.4f));
+			lightReceiverShader.SetUniform("material.specular", glm::vec3(0.7f,	0.7f,	0.04f));
+			lightReceiverShader.SetUniform("material.shininess", .078125f * 128);
+
+			lightReceiverShader.SetUniform("light.position", lightWorldPosition);
+			lightReceiverShader.SetUniform("light.ambient", glm::vec3(.2f));
+			lightReceiverShader.SetUniform("light.diffuse", glm::vec3(.5f));
+			lightReceiverShader.SetUniform("light.specular", glm::vec3(1.f));
+			lightReceiverShader.SetUniform("objectColor", Colors::YELLOW);
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
 
 
