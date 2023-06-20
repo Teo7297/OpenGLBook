@@ -261,7 +261,6 @@ int main()
 
 			/*const glm::vec3 cameraWorldPosition = glm::vec3(camera.GetView() * glm::vec4(0.f, 0.f, 0.f, 1.f));*/
 
-			//////////////// DRAW CUBE //////////////////
 
 			// Shader
 			lightReceiverShader.Bind();
@@ -269,12 +268,10 @@ int main()
 			lightReceiverShader.SetUniform("view", camera.GetView());
 			lightReceiverShader.SetUniform("projection", projection);
 
-
 			lightReceiverShader.SetUniform("material.diffuse", 2);
 			lightReceiverShader.SetUniform("material.specular", 3);
 			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.5f));
 			lightReceiverShader.SetUniform("material.shininess", 32.f);
-
 
 			lightReceiverShader.SetUniform("light.position", lightWorldPosition);
 			lightReceiverShader.SetUniform("light.direction", -0.2f, -1.0f, -0.3f);
@@ -283,6 +280,7 @@ int main()
 			lightReceiverShader.SetUniform("light.specular", 1.f, 1.f, 1.f);
 			lightReceiverShader.SetUniform("objectColor", Colors::WHITE);
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
+
 
 
 			lightEmitterShader.Bind();
@@ -302,15 +300,12 @@ int main()
 			texture4.Activate();
 			texture4.Bind();
 
-			// VAO
-			VAO_Rect.Bind();
-
-			for (int i = 0; i < (int)inputProcessor.m_mixFactor; i++)
+			for (unsigned int i = 0; i < 10; i++)
 			{
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, cubePositions[i]);
-				float angle = 20.0f * i;
-				model = glm::rotate(model, glm::radians(angle * sinVal), glm::vec3(1.0f, 0.3f, 0.5f));
+				model = glm::rotate(model, glm::radians(20.0f * i * sinVal), glm::vec3(1.0f, 0.3f, 0.5f));
+				lightReceiverShader.Bind();
 				lightReceiverShader.SetUniform("model", model);
 
 				renderer.Draw(VAO_Rect, EBO_Rect, lightReceiverShader);
@@ -320,8 +315,6 @@ int main()
 
 
 			// Unbinding
-			Shader::Unbind();
-			VAO_Rect.Unbind();
 			texture2.Unbind();
 
 			//////////////// END RECTANGLE //////////////////
