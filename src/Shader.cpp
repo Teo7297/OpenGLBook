@@ -125,6 +125,11 @@ void Shader::SetUniform(const std::string& name, glm::vec3 vec3) const
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), vec3.x, vec3.y, vec3.z);
 }
 
+void Shader::SetUniform(const std::string& name, const glm::vec3& vec3arr, int length) const
+{
+	glUniform3fv(glGetUniformLocation(ID, name.c_str()), length, glm::value_ptr(vec3arr));
+}
+
 void Shader::SetUniform(const std::string& name, const Color& color) const
 {
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), color.r, color.g, color.b);

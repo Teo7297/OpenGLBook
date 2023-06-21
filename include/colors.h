@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/gtc/random.hpp>
 
 typedef struct {
     float r;
@@ -32,5 +33,10 @@ public:
 	DEFINE_COLOR(OLIVE, 0.5f, 0.5f, 0.0f);
 	DEFINE_COLOR(MAROON, 0.5f, 0.0f, 0.0f);
 
-
+	static Color RandomColor()
+	{
+		return Color{glm::linearRand(0.f, 1.f),glm::linearRand(0.f, 1.f), glm::linearRand(0.f, 1.f) };
+	}
 };
+
+

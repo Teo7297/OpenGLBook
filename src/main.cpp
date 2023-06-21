@@ -258,7 +258,7 @@ int main()
 
 			const glm::vec3 lightWorldPosition = glm::vec3(model2 * glm::vec4(0.f, 0.f, 0.f, 1.f));
 
-
+			
 			/*const glm::vec3 cameraWorldPosition = glm::vec3(camera.GetView() * glm::vec4(0.f, 0.f, 0.f, 1.f));*/
 
 
@@ -273,20 +273,36 @@ int main()
 			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.5f));
 			lightReceiverShader.SetUniform("material.shininess", 32.f);
 
+			// directional
+			lightReceiverShader.SetUniform("directional_light.direction", -0.2f, -1.0f, -0.3f);
+			lightReceiverShader.SetUniform("directional_light.ambientStrength", .05f, .05f, .05f);
+			lightReceiverShader.SetUniform("directional_light.diffuseStrength", .1f, .1f, .1f);
+			lightReceiverShader.SetUniform("directional_light.specularStrength", .5f, .5f, .5f);
 
-			lightReceiverShader.SetUniform("light.position", lightWorldPosition);
-			//lightReceiverShader.SetUniform("light.direction", -0.2f, -1.0f, -0.3f);
-			lightReceiverShader.SetUniform("light.direction", glm::normalize(glm::vec3(0.f) - lightWorldPosition));
-			lightReceiverShader.SetUniform("light.ambient", .2f, .2f, .2f);
-			lightReceiverShader.SetUniform("light.diffuse", .5f, .5f, .5f);
+			// spot
+			lightReceiverShader.SetUniform("spot_light.position", lightWorldPosition);
+			lightReceiverShader.SetUniform("spot_light.direction", glm::normalize(glm::vec3(0.f) - lightWorldPosition));
+			lightReceiverShader.SetUniform("spot_light.ambientStrength", .2f, .2f, .2f);
+			lightReceiverShader.SetUniform("spot_light.diffuseStrength", .5f, .5f, .5f);
+			lightReceiverShader.SetUniform("spot_light.specularStrength", .5f, .5f, .5f);
+			lightReceiverShader.SetUniform("spot_light.constant", 1.f);
+			lightReceiverShader.SetUniform("spot_light.linear", 0.09f);
+			lightReceiverShader.SetUniform("spot_light.quadratic", 0.032f);
+			lightReceiverShader.SetUniform("spot_light.cutOff", cos(glm::radians(7.5f)));
+			lightReceiverShader.SetUniform("spot_light.outerCutOff", cos(glm::radians(12.f)));
 
-			lightReceiverShader.SetUniform("light.constant", 1.f);
-			lightReceiverShader.SetUniform("light.linear", 0.09f);
-			lightReceiverShader.SetUniform("light.quadratic", 0.032f);
 
-			lightReceiverShader.SetUniform("light.cutOff", cos(glm::radians(7.5f)));
-			lightReceiverShader.SetUniform("light.outerCutOff", cos(glm::radians(12.f)));
+			// point
+			constexpr int pointlights_amount = 5;
 
+			lightReceiverShader.SetUniform("point_lights.amount", pointlights_amount);
+			lightReceiverShader.SetUniform("point_lights.ambientStrength", .05f, .05f, .05f);
+			lightReceiverShader.SetUniform("point_lights.diffuseStrength", glm::vec3(1.f));
+			lightReceiverShader.SetUniform("point_lights.specularStrength", glm::vec3(1.f));
+			lightReceiverShader.SetUniform("point_lights.constant", 1.f);
+			lightReceiverShader.SetUniform("point_lights.linear", 0.09f);
+			lightReceiverShader.SetUniform("point_lights.quadratic", 0.032f);
+			lightReceiverShader.SetUniform("point_lights.color", Colors::RED);
 
 			lightReceiverShader.SetUniform("objectColor", Colors::WHITE);
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
@@ -310,19 +326,46 @@ int main()
 			texture4.Activate();
 			texture4.Bind();
 
+			glm::vec3 pointlights_pos[pointlights_amount] = {};
+			glm::mat4 lightModels[pointlights_amount] = {};
+			for (int i = 0; i < pointlights_amount; i++)
+			{
+				const glm::mat4 model3 =
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3(sinVal, cosVal, 1.f - 3 * (float)i))
+					*
+					glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.12f));
+
+				const glm::vec3 pointlightWorldPosition = glm::vec3(model3 * glm::vec4(0.f, 0.f, 0.f, 1.f));
+
+				pointlights_pos[i] = pointlightWorldPosition;
+				lightModels[i] = model3;
+			}
+			lightReceiverShader.Bind();
+			lightReceiverShader.SetUniform("point_lights.position", *pointlights_pos, 2);
+
 			for (unsigned int i = 0; i < 9; i++)
 			{
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, cubePositions[i]);
-				model = glm::rotate(model, glm::radians(20.0f * i * sinVal), glm::vec3(1.0f, 0.3f, 0.5f));
+				//model = glm::rotate(model, glm::radians(20.0f * i * sinVal), glm::vec3(1.0f, 0.3f, 0.5f));
 				lightReceiverShader.Bind();
 				lightReceiverShader.SetUniform("model", model);
 
 				renderer.Draw(VAO_Rect, EBO_Rect, lightReceiverShader);
 			}
-
+			// spotlight render
 			renderer.Draw(VAO_Rect, EBO_Rect, lightEmitterShader);
 
+			// pointlight render
+			for(int i = 0; i < pointlights_amount; i++)
+			{
+				lightEmitterShader.Bind();
+				lightEmitterShader.SetUniform("model", lightModels[i]);
+				lightEmitterShader.SetUniform("view", camera.GetView());
+				lightEmitterShader.SetUniform("projection", projection);
+				lightEmitterShader.SetUniform("u_color", Colors::RED);
+				renderer.Draw(VAO_Rect, EBO_Rect, lightEmitterShader);
+			}
 
 			// Unbinding
 			texture2.Unbind();
