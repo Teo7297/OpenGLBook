@@ -274,26 +274,28 @@ int main()
 			lightReceiverShader.SetUniform("material.shininess", 32.f);
 
 			// directional
+			lightReceiverShader.SetUniform("directional_light.toggled", false);
 			lightReceiverShader.SetUniform("directional_light.direction", -0.2f, -1.0f, -0.3f);
 			lightReceiverShader.SetUniform("directional_light.ambientStrength", .05f, .05f, .05f);
 			lightReceiverShader.SetUniform("directional_light.diffuseStrength", .1f, .1f, .1f);
 			lightReceiverShader.SetUniform("directional_light.specularStrength", .5f, .5f, .5f);
 
 			// spot
+			lightReceiverShader.SetUniform("spot_light.toggled", true);
 			lightReceiverShader.SetUniform("spot_light.position", lightWorldPosition);
 			lightReceiverShader.SetUniform("spot_light.direction", glm::normalize(glm::vec3(0.f) - lightWorldPosition));
-			lightReceiverShader.SetUniform("spot_light.ambientStrength", .2f, .2f, .2f);
-			lightReceiverShader.SetUniform("spot_light.diffuseStrength", .5f, .5f, .5f);
-			lightReceiverShader.SetUniform("spot_light.specularStrength", .5f, .5f, .5f);
+			lightReceiverShader.SetUniform("spot_light.ambientStrength", glm::vec3(.01f));
+			lightReceiverShader.SetUniform("spot_light.diffuseStrength", glm::vec3(1.f));
+			lightReceiverShader.SetUniform("spot_light.specularStrength", glm::vec3(1.f));
 			lightReceiverShader.SetUniform("spot_light.constant", 1.f);
 			lightReceiverShader.SetUniform("spot_light.linear", 0.09f);
 			lightReceiverShader.SetUniform("spot_light.quadratic", 0.032f);
 			lightReceiverShader.SetUniform("spot_light.cutOff", cos(glm::radians(7.5f)));
-			lightReceiverShader.SetUniform("spot_light.outerCutOff", cos(glm::radians(12.f)));
+			lightReceiverShader.SetUniform("spot_light.outerCutOff", cos(glm::radians(10.f)));
 
 
 			// point
-			constexpr int pointlights_amount = 5;
+			constexpr int pointlights_amount = 3;
 
 			lightReceiverShader.SetUniform("point_lights.amount", pointlights_amount);
 			lightReceiverShader.SetUniform("point_lights.ambientStrength", .05f, .05f, .05f);
@@ -302,7 +304,7 @@ int main()
 			lightReceiverShader.SetUniform("point_lights.constant", 1.f);
 			lightReceiverShader.SetUniform("point_lights.linear", 0.09f);
 			lightReceiverShader.SetUniform("point_lights.quadratic", 0.032f);
-			lightReceiverShader.SetUniform("point_lights.color", Colors::RED);
+			lightReceiverShader.SetUniform("point_lights.color", Colors::WHITE);
 
 			lightReceiverShader.SetUniform("objectColor", Colors::WHITE);
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
@@ -331,7 +333,7 @@ int main()
 			for (int i = 0; i < pointlights_amount; i++)
 			{
 				const glm::mat4 model3 =
-					glm::translate(glm::identity<glm::mat4>(), glm::vec3(sinVal, cosVal, 1.f - 3 * (float)i))
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3((i%2 ? sinVal : cosVal) * 4, 0.f, 1.f - 4 * (float)i))
 					*
 					glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.12f));
 
@@ -363,7 +365,7 @@ int main()
 				lightEmitterShader.SetUniform("model", lightModels[i]);
 				lightEmitterShader.SetUniform("view", camera.GetView());
 				lightEmitterShader.SetUniform("projection", projection);
-				lightEmitterShader.SetUniform("u_color", Colors::RED);
+				lightEmitterShader.SetUniform("u_color", Colors::WHITE);
 				renderer.Draw(VAO_Rect, EBO_Rect, lightEmitterShader);
 			}
 

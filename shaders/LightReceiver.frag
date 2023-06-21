@@ -10,6 +10,7 @@ struct Material
 
 struct DirectionalLight
 {
+    bool toggled;
     vec3 direction;
 
     vec3 ambientStrength;
@@ -19,6 +20,8 @@ struct DirectionalLight
 
 struct SpotLight
 {
+    bool toggled;
+
     vec3 position;
     vec3 direction;
 
@@ -75,6 +78,8 @@ vec3 norm;
 
 vec3 computeDirectionalLight()
 {
+    if(!directional_light.toggled)
+        return vec3(0);
     // ambient
     vec3 ambient = directional_light.ambientStrength * vec3(texture(material.diffuse, TexCoords));
     
@@ -96,6 +101,8 @@ vec3 computeDirectionalLight()
 
 vec3 computeSpotLight()
 {
+    if(!spot_light.toggled)
+        return vec3(0);
     // ambient
     vec3 ambient = spot_light.ambientStrength * vec3(texture(material.diffuse, TexCoords));
     
