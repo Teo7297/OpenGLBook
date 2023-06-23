@@ -4,10 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/random.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <iostream>
 
-#include <Colors.h>
 
 #include <Shader.h>
 #include <InputProcessor.h>
@@ -15,6 +17,7 @@
 #include <Camera.h>
 #include <Renderer.h>
 #include <VertexBufferLayout.h>
+#include <Colors.h>
 
 
 #define FLOAT_SIZE sizeof(GL_FLOAT)
@@ -51,7 +54,14 @@ glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);\
 print_attributes_supported();
 
 
-
+#define IMGUI_INIT() \
+	IMGUI_CHECKVERSION();\
+	ImGui::CreateContext();\
+	ImGuiIO& io = ImGui::GetIO();\
+	(void)io;\
+	ImGui::StyleColorsDark();\
+	ImGui_ImplGlfw_InitForOpenGL(window, true);\
+	ImGui_ImplOpenGL3_Init();
 
 void print_attributes_supported()
 {
@@ -85,6 +95,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
 
+	IMGUI_INIT();
 	///////////////////////////////////////////////////////////// SHADERS /////////////////////////////////////////////////////////////
 
 
@@ -231,6 +242,10 @@ int main()
 		{
 			inputProcessor.Process();
 
+
+			
+
+
 			renderer.SetBackgroundColor(Colors::DARK_GRAY);
 			renderer.Clear();
 			// Time transform variable to see things moving easily
@@ -373,6 +388,15 @@ int main()
 
 			//////////////// END RECTANGLE //////////////////
 
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+			ImGui::Begin("Test");
+			ImGui::SetWindowSize(ImVec2(400, 200));
+			ImGui::Button("Hello");
+			ImGui::End();
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
