@@ -7,6 +7,7 @@ InputProcessor::InputProcessor(GLFWwindow* window, float mixFactor)
 }
 
 extern float* DELTA_TIME;
+bool cursorActive = false;
 
 void InputProcessor::Process()
 {
@@ -15,7 +16,21 @@ void InputProcessor::Process()
 		glfwSetWindowShouldClose(m_window, true);
 
 	if (glfwGetKey(m_window, GLFW_KEY_F1) == GLFW_PRESS)
+	{
+
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		cursorActive = false;
+		
+	}
+
+	if (glfwGetKey(m_window, GLFW_KEY_F2) == GLFW_PRESS)
+	{
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		cursorActive = true;
+	}
+
+	if (cursorActive) return;
+
 
 	if (glfwGetKey(m_window, GLFW_KEY_F3) == GLFW_PRESS)
 		//EventManager::Get()->dispatchEvent(&onF3Pressed);

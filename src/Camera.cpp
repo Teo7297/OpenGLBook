@@ -27,6 +27,8 @@ glm::mat4 Camera::GetView()
  */
 void Camera::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) return;
+
 	Camera& camera = GetInstance();
 	if (camera.m_FirstMouseTick)
 	{
@@ -62,6 +64,8 @@ void Camera::mouse_callback(GLFWwindow* window, double xpos, double ypos)
  */
 void Camera::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) return;
+
 	Camera& camera = GetInstance();
 	camera.m_POV -= (float)yoffset;
 	if (camera.m_POV < 1.0f)
