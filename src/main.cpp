@@ -6,7 +6,6 @@
 #include <glm/gtc/random.hpp>
 
 #include <iostream>
-#include <thread>
 
 #include <Colors.h>
 
