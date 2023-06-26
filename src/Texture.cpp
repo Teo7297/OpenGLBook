@@ -30,17 +30,17 @@ Texture::Texture(const char* path, GLenum target, GLenum internalformat, GLenum 
 	glBindTexture(target, 0);
 }
 
-void Texture::Activate()
+void Texture::Activate() const
 {
 	glActiveTexture(m_Number);
 }
 
-void Texture::Bind()
+void Texture::Bind() const
 {
 	glBindTexture(m_Target, m_ID);
 }
 
-void Texture::Unbind()
+void Texture::Unbind() const
 {
 	glBindTexture(m_Target, 0);
 }

@@ -8,9 +8,9 @@ class Texture
 public:
 	Texture(const char* path, GLenum target, GLenum internalformat, GLenum format, bool flipV = false);
 	~Texture(){};
-	void Activate();
-	void Bind();
-	void Unbind();
+	void Activate() const;
+	void Bind() const;
+	void Unbind() const;
 	/// Set a texture parameter. This operation will leave the texture as ACTIVE!
 	void GL_TexParameteri(GLenum pname, GLenum param);
 	bool IsLoaded();

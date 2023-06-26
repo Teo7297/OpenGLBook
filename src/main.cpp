@@ -282,8 +282,8 @@ int main()
 			lightReceiverShader.SetUniform("view", camera.GetView());
 			lightReceiverShader.SetUniform("projection", projection);
 
-			lightReceiverShader.SetUniform("material.diffuse", 2);
-			lightReceiverShader.SetUniform("material.specular", 3);
+			lightReceiverShader.SetUniform("material.diffuse", 2);		//! This is the texture index!
+			lightReceiverShader.SetUniform("material.specular", 3);		//! This is the texture index!
 			//lightReceiverShader.SetUniform("material.specular", glm::vec3(0.5f));
 			lightReceiverShader.SetUniform("material.shininess", 32.f);
 
@@ -383,8 +383,6 @@ int main()
 				renderer.Draw(VAO_Rect, EBO_Rect, lightEmitterShader);
 			}
 
-			// Unbinding
-			texture2.Unbind();
 
 			//////////////// END RECTANGLE //////////////////
 
