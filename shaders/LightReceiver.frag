@@ -152,7 +152,6 @@ vec3 computePointLights()
     for(int i = 0; i < point_lights.amount; i++)
     {
         vec3 pos = point_lights.position[i];
-        //vec3 pos = point_lights.position;
         
         // ambient
         vec3 ambient = point_lights.ambientStrength * vec3(texture(material.diffuse, TexCoords));
@@ -171,11 +170,8 @@ vec3 computePointLights()
         // Attenuation
         float distance = length(pos - FragPos);
         float attenuation = 1.0 / (point_lights.constant + point_lights.linear * distance + point_lights.quadratic * (distance * distance));
-        ambient *= attenuation;
-        diffuse *= attenuation;
-        specular *= attenuation;
 
-        result += (ambient + diffuse + specular) * point_lights.color;
+        result += (ambient + diffuse + specular) * attenuation * point_lights.color;
     } 
    return result;
 }
@@ -188,8 +184,8 @@ void main()
     vec3 result = (computeSpotLight() + computePointLights() + computeDirectionalLight());
     result.x = min(result.x, 1.f);   
     result.y = min(result.y, 1.f);   
-    result.z = min(result.z, 1.f);  
-    
+    result.z = min(result.z, 1.f);
+
     FragColor = vec4(result * objectColor, 1.f);
 
 } 

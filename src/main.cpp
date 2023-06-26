@@ -324,7 +324,6 @@ int main()
 			lightReceiverShader.SetUniform("viewPos", camera.m_Pos);
 
 
-
 			lightEmitterShader.Bind();
 			lightEmitterShader.SetUniform("model", model2);
 			lightEmitterShader.SetUniform("view", camera.GetView());
@@ -348,6 +347,7 @@ int main()
 			{
 				const glm::mat4 model3 =
 					glm::translate(glm::identity<glm::mat4>(), glm::vec3((i%2 ? sinVal : cosVal) * 4, 0.f, 1.f - 4 * (float)i))
+					//glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -5 * i))
 					*
 					glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.12f));
 
@@ -357,7 +357,7 @@ int main()
 				lightModels[i] = model3;
 			}
 			lightReceiverShader.Bind();
-			lightReceiverShader.SetUniform("point_lights.position", *pointlights_pos, 2);
+			lightReceiverShader.SetUniform("point_lights.position", *pointlights_pos, pointlights_amount);
 
 			for (unsigned int i = 0; i < 9; i++)
 			{
