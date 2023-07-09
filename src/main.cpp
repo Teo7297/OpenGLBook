@@ -17,6 +17,7 @@
 #include <Camera.h>
 #include <Renderer.h>
 #include <VertexBufferLayout.h>
+#include <ElementBuffer.h>
 #include <Colors.h>
 
 
@@ -51,7 +52,7 @@ if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))\
 }\
 glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);\
 glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);\
-print_attributes_supported();
+print_attributes_supported()
 
 
 #define IMGUI_INIT() \
@@ -61,7 +62,7 @@ print_attributes_supported();
 	(void)io;\
 	ImGui::StyleColorsDark();\
 	ImGui_ImplGlfw_InitForOpenGL(window, true);\
-	ImGui_ImplOpenGL3_Init();
+	ImGui_ImplOpenGL3_Init()
 
 void print_attributes_supported()
 {
