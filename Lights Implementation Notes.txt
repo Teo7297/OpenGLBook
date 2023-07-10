@@ -1,0 +1,13 @@
+In a 3D engine, there are different ways to handle the communication between game objects and lights in a scene. Here's a common approach:
+
+1. Light Component: Each game object that can interact with lights should have a light component attached to it. This component contains information about how the object should respond to lighting in the scene.
+
+2. Light Manager: The scene typically has a light manager or a lighting system responsible for managing all the lights in the scene. It keeps track of active lights, their positions, intensities, colors, and other relevant properties.
+
+3. Light Registration: When a game object is placed into the scene, its light component needs to register with the light manager. This allows the light manager to keep track of which objects are affected by which lights.
+
+4. Light Queries: When rendering a frame, each game object can query the light manager to retrieve information about the lights that affect its position. This information includes the position, intensity, color, and other relevant properties of nearby lights.
+
+5. Lighting Calculations: Using the information received from the light manager, the game object can perform lighting calculations to determine how it should be shaded and lit. These calculations can include techniques such as per-pixel or per-vertex lighting, shadows, and various shading models.
+
+By following this approach, game objects can dynamically adapt to the lighting conditions in the scene, allowing for realistic rendering and visual effects. Keep in mind that this is a general overview, and the actual implementation details may vary depending on the specific engine or framework you're using.

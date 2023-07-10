@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef __gl_h_
 #include <glad/glad.h>
+#endif
 #include <stb_image.h>
 
 class Texture

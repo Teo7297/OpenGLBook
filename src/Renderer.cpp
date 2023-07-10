@@ -1,6 +1,8 @@
 #include <Renderer.h>
 #include <iostream>
+#ifndef __gl_h_
 #include <glad/glad.h>
+#endif
 
 void GLClearError()
 {
